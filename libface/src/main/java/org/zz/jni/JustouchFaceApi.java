@@ -130,10 +130,10 @@ public class JustouchFaceApi {
                 iFaceNum	 - 输入，人脸模板个数（建议小于5000）
                 score        - 输入，比对分通过阈值（建议76）
                 pFaceFea     - 输入，人脸特征
-                pFaceInfo    - 输入/输出，人脸识别注册库id
+                pFaceInfo    - 输入/输出，人脸识别注册库idt
      返	回：	0-成功，-1-识别中，其他-失败
      *******************************************************************************************/
-    public native int searchFeature(byte[] pFaceFeaList, int iPictureNum, int score, byte[] pFaceFea, int[] pFaceInfo);
+    public native int searchFeature(byte[] libs, int libCount, int threshold, byte[] sourceFeature, int[] resultFaceInfo);
 
     /*******************************************************************************************
     功	能：	根据输入人脸特征与人脸模板集合，查找匹配人脸特征的序号(同一人可含有多张图片)
@@ -147,6 +147,5 @@ public class JustouchFaceApi {
         faceInfo     - 输入/输出，人脸识别注册库id
     返	回：	0-成功，-1-识别中，-2-陌生人，-3人脸模板个数过多，其他失败
     *******************************************************************************************/
-    public native int searchNFeature(byte[] pFaceFeaList, int iPictureNum, int[] pFaceNumList,
-                                        int iPersonNum, int score, byte[] pFaceFea, int[] pFaceInfo);
+    public native int searchNFeature(byte[] libs, int picNumber, int[] eachPersonPicNumber, int personNumber, int threshold, byte[] sourceFeature, int[] resultFaceInfo);
 }

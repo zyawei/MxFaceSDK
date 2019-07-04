@@ -1,6 +1,11 @@
 package com.mx.face.api
 
+import androidx.annotation.WorkerThread
 import com.miaxis.image.MxImage
+import com.mx.face.api.vo.FaceData
+import com.mx.face.api.vo.FaceFeature
+import com.mx.face.api.vo.FaceQuality
+import com.mx.face.api.vo.Person
 
 /**
  *
@@ -10,11 +15,22 @@ import com.miaxis.image.MxImage
  */
 interface MxFaceApi {
 
-    fun detectFace(image: MxImage, track: Boolean)
+    @WorkerThread
+    fun detectFace(image: MxImage, track: Boolean): Array<FaceData>
 
-    fun extractQuality()
+    @WorkerThread
+    fun extractQuality(image: MxImage, vararg faceData: FaceData): Array<FaceQuality>
 
-    fun extractFeature()
+    @WorkerThread
+    fun extractFeature(image: MxImage, vararg faceData: FaceData): Array<FaceFeature>
 
-    fun match()
+    @WorkerThread
+    fun matchFeature(feature: FaceFeature, featureB: FaceFeature): Float
+
+//    @WorkerThread
+//    fun searchFeature(feature: FaceFeature, vararg persons: Person, threshold: Int): Person?
+
+    @WorkerThread
+    fun searchFeature(feature: FaceFeature, persons: Iterable<Person>, threshold: Int): Person?
+
 }
