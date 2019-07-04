@@ -62,7 +62,7 @@ class MxFaceApiImpl(private val justTouchFaceApi: JustouchFaceApi) : MxFaceApi {
         return persons.find {
             /*合并这个人的人脸数据*/
             val arrays = when (it.features.size) {
-                0 -> emptyArray()
+                0 -> ByteArray(0)
                 1 -> it.features[0].bytes
                 else -> {
                     ByteArray(it.features.size * justTouchFaceApi.featureSize).apply {
