@@ -7,4 +7,4 @@ package com.mx.face.api.vo
  * @email zyawei@live.com
  */
 
-data class FaceQuality(val quality: Int)
+open class FaceQuality(val quality: Int,val eyeDistance:Int)

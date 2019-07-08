@@ -1,5 +1,7 @@
 package com.mx.face.api.vo
 
+import com.miaxis.image.MxImage
+
 /**
  *
  * @author zhangyw
@@ -7,13 +9,5 @@ package com.mx.face.api.vo
  * @email zyawei@live.com
  */
 
-class Person(id: Long, val features: MutableList<FaceFeature>){
+open class Person(val id: Long = 0, val images: List<MxImage>, val features: List<FaceFeature>, val tag: String = "")
 
-    fun addFaceFeature(faceFeature: FaceFeature){
-        features.add(faceFeature)
-    }
-
-    fun removeFaceFeature(faceFeature: FaceFeature){
-        features.remove(faceFeature)
-    }
-}

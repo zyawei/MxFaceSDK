@@ -63,7 +63,7 @@ class MxConfig {
     var modelPath: String? = null
     var licencePath: String? = null
     var mode = 0
-    var maxFaceCount = 10
+    var maxFaceCount = 3
     var defaultThreshold = 76
     var rootStoragePath: String = File(Environment.getExternalStorageDirectory(), "mx-face").absolutePath
 

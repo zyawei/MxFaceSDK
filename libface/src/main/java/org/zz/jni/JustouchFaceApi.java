@@ -112,7 +112,7 @@ public class JustouchFaceApi {
                                      int pFaceNum, int[] pFaceInfo);
 
     /*******************************************************************************************
-     功	能：	计算注册人脸质量分数（包含检测人脸功能）
+     功	能：	计算注册人脸质量分数
      参	数：	pImage      - 输入，RGB图像数据
                 nImgWidth   - 输入，图像宽度
                 nImgHeight  - 输入，图像高度
@@ -120,8 +120,7 @@ public class JustouchFaceApi {
      返	回：	质量分(0-100),建议:90
      备 注:      只能是一个人脸
      *******************************************************************************************/
-    public native int faceQuality4Reg(byte[] pImage, int nWidth, int nHeight,
-                                         int[] pFaceInfo);
+    public native int faceQuality4Reg(byte[] pImage, int nWidth, int nHeight, int[] pFaceInfo);
 
     /*******************************************************************************************
      功	能：	根据输入人脸特征与人脸模板集合，查找匹配人脸特征的序号
@@ -133,7 +132,7 @@ public class JustouchFaceApi {
                 pFaceInfo    - 输入/输出，人脸识别注册库idt
      返	回：	0-成功，-1-识别中，其他-失败
      *******************************************************************************************/
-    public native int searchFeature(byte[] libs, int libCount, int threshold, byte[] sourceFeature, int[] resultFaceInfo);
+    public native int searchFeature(byte[] featureLibs, int featureCount, int threshold, byte[] sourceFeature, int[] resultFaceInfo);
 
     /*******************************************************************************************
     功	能：	根据输入人脸特征与人脸模板集合，查找匹配人脸特征的序号(同一人可含有多张图片)

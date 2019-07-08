@@ -11,4 +11,4 @@ import android.graphics.Rect
  * @email zyawei@live.com
  */
 
-class FaceData(val trackId: Int = -1, val faceArea: Rect, val keyPoints: Array<Point>)
+open class FaceData(val trackId: Int = -1, val faceArea: Rect, val keyPoints: List<Point>)

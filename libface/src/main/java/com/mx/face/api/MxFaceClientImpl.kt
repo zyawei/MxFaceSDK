@@ -13,14 +13,15 @@ import org.zz.jni.JustouchFaceApi
 object MxFaceClientImpl : MxFaceClient {
 
     private val justouchFaceApi = JustouchFaceApi()
-    private val faceApi = MxFaceApiImpl(justouchFaceApi)
+    private lateinit var faceApi : MxFaceApi
 
 
     override fun init(application: Context, config: MxConfig): Int {
+        faceApi = MxFaceApiImpl(justouchFaceApi,config)
         return if (config.mode == 0) {
-            justouchFaceApi.initAlg(application, config.licencePath, config.modelPath)
+            justouchFaceApi.initAlg(application, config.modelPath,config.licencePath)
         } else {
-            justouchFaceApi.initAlgN(application, config.licencePath, config.modelPath)
+            justouchFaceApi.initAlgN(application, config.modelPath, config.licencePath)
         }
     }
 

@@ -9,6 +9,7 @@ import com.mx.face.api.vo.FaceQuality
 import com.mx.face.api.vo.Person
 import org.zz.api.MXFaceInfoEx
 import org.zz.jni.JustouchFaceApi
+import java.lang.IllegalArgumentException
 import java.util.*
 
 /**
@@ -17,14 +18,33 @@ import java.util.*
  * @date 2019-07-03 10:37
  * @email zyawei@live.com
  */
-class MxFaceApiImpl(private val justTouchFaceApi: JustouchFaceApi) : MxFaceApi {
+class MxFaceApiImpl(private val justTouchFaceApi: JustouchFaceApi, config: MxConfig) : MxFaceApi {
+    companion object {
+        private const val MAX_KEY_POINT_NUM = 120
+        private const val SIZE = 22 + 2 * MAX_KEY_POINT_NUM
+
+    }
+
+    //todo 更新Config时的处理
+    private val maxFaceCount = config.maxFaceCount
+    private val faceIntSize = maxFaceCount * SIZE
+    private val trackFaceData = IntArray(faceIntSize)
+
 
     override fun detectFace(image: MxImage, track: Boolean): Array<FaceData> {
         val faceNumberResult = intArrayOf(1)
-        val intsFaceData = IntArray(1024)
+        val intsFaceData = trackFaceData
+        if (image.data == null || image.data.isEmpty()) {
+            throw IllegalArgumentException("Image data size is 0")
+        }
+        if (image.width == 0 || image.height == 0) {
+            throw IllegalArgumentException("Image width/height is 0 " + image.width + "/" + image.height)
+        }
+
         if (track) {
             justTouchFaceApi.trackFace(image.data, image.width, image.height, faceNumberResult, intsFaceData)
         } else {
+            intsFaceData.fill(0)
             justTouchFaceApi.detectFace(image.data, image.width, image.height, faceNumberResult, intsFaceData)
         }
         return int2javaFaceData(intsFaceData, faceNumberResult[0])
@@ -58,10 +78,10 @@ class MxFaceApiImpl(private val justTouchFaceApi: JustouchFaceApi) : MxFaceApi {
         return result[0]
     }
 
-    override fun searchFeature(feature: FaceFeature,  persons: Iterable<Person>, threshold: Int): Person? {
+    override fun searchFeature(feature: FaceFeature, persons: Iterable<Person>, threshold: Int): Person? {
         return persons.find {
             /*合并这个人的人脸数据*/
-            val arrays = when (it.features.size) {
+            /*val arrays = when (it.features.size) {
                 0 -> ByteArray(0)
                 1 -> it.features[0].bytes
                 else -> {
@@ -71,18 +91,23 @@ class MxFaceApiImpl(private val justTouchFaceApi: JustouchFaceApi) : MxFaceApi {
                         }
                     }
                 }
-            }
-            val resultIndex = IntArray(1)
-            val result =
-                justTouchFaceApi.searchNFeature(arrays, 1, intArrayOf(1), 1, threshold, feature.bytes, resultIndex)
-            return@find result == 0
+            }*/
+            val resultScore = FloatArray(1)
+            val featureMatch = justTouchFaceApi.featureMatch(feature.bytes, it.features[0].bytes, resultScore)
+            return@find featureMatch == 0 && (100 * resultScore[0]) > threshold
+
+//            val resultIndex = IntArray(1)
+//            val result = justTouchFaceApi.searchFeature(arrays, it.features.size, threshold, feature.bytes, resultIndex)
+//            val result = justTouchFaceApi.searchNFeature(arrays, it.images.size, intArrayOf(it.images.size), 1, threshold, feature.bytes, resultIndex)
+//            return@find result == 0
         }
     }
 
     private fun int2javaQuality(faceIntArray: IntArray, faceNumber: Int): Array<FaceQuality> {
         return Array(faceNumber) {
             val quality = faceIntArray[it * MXFaceInfoEx.SIZE + 8 + 2 * MXFaceInfoEx.MAX_KEY_POINT_NUM]
-            FaceQuality(quality)
+            val eyeDistance = faceIntArray[it * MXFaceInfoEx.SIZE + 9 + 2 * MXFaceInfoEx.MAX_KEY_POINT_NUM]
+            FaceQuality(quality, eyeDistance)
         }
     }
 
@@ -95,7 +120,7 @@ class MxFaceApiImpl(private val justTouchFaceApi: JustouchFaceApi) : MxFaceApi {
                 bottom = faceIntArray[it * MXFaceInfoEx.SIZE + 3] + top
             }
             val keyPointNumber = faceIntArray[it * MXFaceInfoEx.SIZE + 4]
-            val points = Array(keyPointNumber) { index ->
+            val points = List(keyPointNumber) { index ->
                 Point(
                     faceIntArray[it * MXFaceInfoEx.SIZE + 5 + index],
                     faceIntArray[it * MXFaceInfoEx.SIZE + 5 + index + MXFaceInfoEx.MAX_KEY_POINT_NUM]
@@ -107,7 +132,7 @@ class MxFaceApiImpl(private val justTouchFaceApi: JustouchFaceApi) : MxFaceApi {
     }
 
     private fun java2intFaceData(faces: Array<out FaceData>): IntArray {
-        return IntArray(1024).apply {
+        return IntArray(faceIntSize).apply {
             faces.forEachIndexed { i, faceDt ->
                 this[i * MXFaceInfoEx.SIZE] = faceDt.faceArea.left
                 this[i * MXFaceInfoEx.SIZE + 1] = faceDt.faceArea.top

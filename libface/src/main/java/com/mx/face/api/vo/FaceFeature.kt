@@ -7,4 +7,4 @@ package com.mx.face.api.vo
  * @email zyawei@live.com
  */
 
-class FaceFeature(val bytes: ByteArray)
+open class FaceFeature(val bytes: ByteArray)
